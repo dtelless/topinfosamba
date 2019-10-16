@@ -21,13 +21,6 @@ if [ ! -f /usr/bin/docker ]; then
 	installdocker
 fi
 
-
-
-
-mkdir ${PWD}/samba
-mkdir -p ${PWD}/samba/lib
-mkdir -p ${PWD}/samba/log
-
 docker create -d --restart unless-stopped \
     --privileged \
     --net nettopinfo \
@@ -36,5 +29,5 @@ docker create -d --restart unless-stopped \
     -e SAMBA_DC_DOMAIN='brservicer' \
     -e SAMBA_DC_ADMIN_PASSWD='T0p123#$' \
     -e SAMBA_DC_DNS_BACKEND='BIND9_DLZ' \
-    -v ${PWD}/samba:/samba \
+#    -v ${PWD}/samba:/samba \
      "topinfo/samba:latest"
