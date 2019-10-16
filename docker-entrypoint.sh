@@ -7,12 +7,13 @@ set -e
 COMMAND=ash
 
 # Add $COMMAND if needed
-if [ "${1:0:1}" = '-' ]; then
-	set -- $COMMAND "$@"
-fi
+#if [ "${1:0:1}" = '-' ]; then
+#	set -- $COMMAND "$@"
+#fi
 
 # Configure the AD DC
 if [ ! -f /samba/etc/smb.conf ]; then
+    /usr/sbin/named -f &&
     mkdir -p /samba/etc /samba/lib /samba/log
     echo "${SAMBA_DC_DOMAIN} - Begin Domain Provisioning"
     samba-tool domain provision --domain="${SAMBA_DC_DOMAIN}" \
@@ -24,7 +25,7 @@ if [ ! -f /samba/etc/smb.conf ]; then
 fi
 
 if [ "$1" = 'samba' ]; then
-    exec /usr/sbin/samba -i
+    exec /usr/sbin/named -f && exec /usr/sbin/samba -i
 fi
 
 # Assume that user wants to run their own process,

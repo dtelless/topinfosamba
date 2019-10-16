@@ -1,15 +1,21 @@
-FROM alpine:latest
-MAINTAINER LasLabs Inc <support@laslabs.com>
+FROM ubuntu:latest
+#MAINTAINER LasLabs Inc <support@laslabs.com>
 
 # Install
-RUN apk add --no-cache samba-dc supervisor \
-    # Remove default config data, if any
-    && rm -rf /etc/samba/smb.conf \
+RUN cat /etc/apt/sources.list | sed s/archive.ubuntu.com/ubuntu.c3sl.ufpr.br/ > teste \
+    && cp teste /etc/apt/sources.list \
+    && apt update \
+    && rm -rf /etc/samba \
     && rm -rf /var/lib/samba \
     && rm -rf /var/log/samba \
+    && mkdir -p /samba/etc \
+    && mkdir -p /samba/lib \
+    && mkdir -p /samba/log \
     && ln -s /samba/etc /etc/samba \
     && ln -s /samba/lib /var/lib/samba \
     && ln -s /samba/log /var/log/samba
+RUN apt -y install samba krb5-config winbind smbclient bind9 \
+    && rm -rf /etc/samba/smb.conf
 
 # Expose ports
 EXPOSE 37/udp \
@@ -32,19 +38,20 @@ VOLUME ["/samba"]
 
 # Copy & set entrypoint for manual access
 COPY ./docker-entrypoint.sh /
+COPY ./named.conf /etc/named/named.conf
 ENTRYPOINT ["/docker-entrypoint.sh"]
 CMD ["samba"]
 
 # Metadata
-ARG BUILD_DATE
-ARG VCS_REF
-ARG VERSION
-LABEL org.label-schema.build-date=$BUILD_DATE \
-      org.label-schema.name="Samba DC - Alpine" \
-      org.label-schema.description="Provides a Docker image for Samba 4 DC on Alpine Linux." \
-      org.label-schema.url="https://laslabs.com/" \
-      org.label-schema.vcs-ref=$VCS_REF \
-      org.label-schema.vcs-url="https://github.com/LasLabs/docker-alpine-samba-dc" \
-      org.label-schema.vendor="LasLabs Inc." \
-      org.label-schema.version=$VERSION \
-      org.label-schema.schema-version="1.0"
+#ARG BUILD_DATE
+#ARG VCS_REF
+#ARG VERSION
+#LABEL org.label-schema.build-date=$BUILD_DATE \
+#      org.label-schema.name="Samba DC - Alpine" \
+#      org.label-schema.description="Provides a Docker image for Samba 4 DC on Alpine Linux." \
+#      org.label-schema.url="https://laslabs.com/" \
+#      org.label-schema.vcs-ref=$VCS_REF \
+#      org.label-schema.vcs-url="https://github.com/LasLabs/docker-alpine-samba-dc" \
+#      org.label-schema.vendor="LasLabs Inc." \
+#      org.label-schema.version=$VERSION \
+#      org.label-schema.schema-version="1.0"
