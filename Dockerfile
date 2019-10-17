@@ -14,7 +14,7 @@ RUN cat /etc/apt/sources.list | sed s/archive.ubuntu.com/ubuntu.c3sl.ufpr.br/ > 
     && ln -s /samba/etc /etc/samba \
     && ln -s /samba/lib /var/lib/samba \
     && ln -s /samba/log /var/log/samba
-RUN apt -y install samba krb5-config winbind smbclient bind9 \
+RUN apt -y install vim openssh-server samba krb5-config winbind smbclient bind9 \
     && rm -rf /etc/samba/smb.conf
 
 # Expose ports
@@ -38,10 +38,11 @@ VOLUME ["/samba"]
 
 # Copy & set entrypoint for manual access
 COPY ./docker-entrypoint.sh /
-COPY ./named.conf /etc/named/named.conf
-ENTRYPOINT ["/docker-entrypoint.sh"]
-CMD ["samba"]
-
+COPY ./named.conf /etc/bind/namedsamba.conf
+COPY ./named.conf.log /etc/bind/named.conf.log
+#ENTRYPOINT ["/docker-entrypoint.sh"]
+#CMD ["samba"]
+CMD ["/bin/bash"]
 # Metadata
 #ARG BUILD_DATE
 #ARG VCS_REF

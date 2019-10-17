@@ -21,7 +21,7 @@ if [ ! -f /usr/bin/docker ]; then
 	installdocker
 fi
 
-docker create -d --restart unless-stopped \
+docker run -d --restart unless-stopped \
     --privileged \
     --net nettopinfo \
     --ip 10.0.5.10 \
