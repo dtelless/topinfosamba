@@ -64,7 +64,7 @@ fi
 
 topsamba=$(docker ps | grep topsamba)
 
-if [ - z $topsamba ]; then
+if [ -z $topsamba ]; then
 	docker run -d --restart unless-stopped \
 	    --privileged \
 	    --net nettopinfo \
