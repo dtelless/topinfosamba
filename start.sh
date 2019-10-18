@@ -29,6 +29,8 @@ docker network create --subnet=$REDEDOCKER -o "com.docker.network.bridge.host_bi
 if [ ! -f /usr/bin/docker ]; then
 	echo -e "Docker não encontrato, instalando Docker\n"
 	installdocker
+else
+	echo -e "Docker já instalado!\n"
 fi
 
 imagem=$(docker image ls | grep topinfo)
@@ -36,6 +38,8 @@ imagem=$(docker image ls | grep topinfo)
 if [ -z "$imagem" ]; then
 	echo -e "Criando imagem para o Container\n"
 	createimage
+else
+	echo -e "Imagem já criada\n"
 fi
 
 rede=$(docker network ls | grep nettopinfo)
@@ -43,6 +47,8 @@ rede=$(docker network ls | grep nettopinfo)
 if [ -z "$rede" ]; then
 	echo "Criando rede virtual\n"
         createvirtualnetwork
+else
+	echo -e "Rede virtual já criada!\n"
 fi
 
 firewallDNAT=$(iptables -L -t nat | grep DNAT | grep $IPCONTAINER)
@@ -56,12 +62,19 @@ if [ -z "$firewallDNAT" ] && [ -z "$firewallSNAT"]; then
 	echo -e "Firewall já configurado"
 fi
 
-docker run -d --restart unless-stopped \
-    --privileged \
-    --net nettopinfo \
-    --ip $IPCONTAINER \
-    -e SAMBA_DC_REALM='brservicer.local' \
-    -e SAMBA_DC_DOMAIN='brservicer' \
-    -e SAMBA_DC_ADMIN_PASSWD='T0p123#$' \
-    -e SAMBA_DC_DNS_BACKEND='BIND9_DLZ' \
-     "topinfo/samba:latest"
+topsamba=$(docker ps | grep topsamba)
+
+if [ - z $topsamba ]; then
+	docker run -d --restart unless-stopped \
+	    --privileged \
+	    --net nettopinfo \
+	    --ip $IPCONTAINER \
+	    -e SAMBA_DC_REALM='brservicer.local' \
+	    -e SAMBA_DC_DOMAIN='brservicer' \
+	    -e SAMBA_DC_ADMIN_PASSWD='T0p123#$' \
+	    -e SAMBA_DC_DNS_BACKEND='BIND9_DLZ' \
+	     "topinfo/samba:latest" \
+	    --name topsamba
+else
+	echo -e "Tudo certo!\n"
+fi
