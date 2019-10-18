@@ -14,7 +14,7 @@ RUN cat /etc/apt/sources.list | sed s/archive.ubuntu.com/ubuntu.c3sl.ufpr.br/ > 
     && ln -s /samba/etc /etc/samba \
     && ln -s /samba/lib /var/lib/samba \
     && ln -s /samba/log /var/log/samba
-RUN DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends openssh-server samba krb5-config winbind smbclient libencode-locale-perl bind9 \
+RUN DEBIAN_FRONTEND=noninteractive apt-get install -y openssh-server samba krb5-config winbind smbclient libencode-locale-perl bind9 \
     && rm -rf /etc/samba/smb.conf && rm -rf /var/lib/apt/lists/*
 
 # Expose ports

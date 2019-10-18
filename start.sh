@@ -1,9 +1,12 @@
 #!/bin/bash
 IPLOCAL=""
 IPSAMBA="192.168.171.212"
+
+REALM="brservicer.local"
+DOMAIN="brservicer"
+
 IPCONTAINER="10.0.5.10"
 REDEDOCKER="10.0.5.0/24"
-
 
 function installdocker {
 sudo apt update
@@ -64,14 +67,16 @@ fi
 
 topsamba=$(docker ps | grep topsamba)
 
-if [ -z $topsamba ]; then
-	docker run -d --restart unless-stopped \
+if [ -z "$topsamba" ]; then
+	docker run \
+	    -d \
+	    --restart unless-stopped \
 	    --name=topsamba \
 	    --privileged \
 	    --net nettopinfo \
 	    --ip $IPCONTAINER \
-	    -e SAMBA_DC_REALM='brservicer.local' \
-	    -e SAMBA_DC_DOMAIN='brservicer' \
+	    -e SAMBA_DC_REALM=$REALM \
+	    -e SAMBA_DC_DOMAIN=$DOMAIN \
 	    -e SAMBA_DC_ADMIN_PASSWD='T0p123#$' \
 	    -e SAMBA_DC_DNS_BACKEND='BIND9_DLZ' \
 	     "topinfo/samba:latest"
