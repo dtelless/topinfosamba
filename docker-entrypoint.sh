@@ -37,4 +37,4 @@ fi
 
 # Assume that user wants to run their own process,
 # for example a `bash` shell to explore this image
-exec "echo hello"
+# exec "echo hello"
