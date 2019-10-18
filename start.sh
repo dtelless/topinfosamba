@@ -66,6 +66,7 @@ topsamba=$(docker ps | grep topsamba)
 
 if [ -z $topsamba ]; then
 	docker run -d --restart unless-stopped \
+	    --name=topsamba \
 	    --privileged \
 	    --net nettopinfo \
 	    --ip $IPCONTAINER \
@@ -73,8 +74,7 @@ if [ -z $topsamba ]; then
 	    -e SAMBA_DC_DOMAIN='brservicer' \
 	    -e SAMBA_DC_ADMIN_PASSWD='T0p123#$' \
 	    -e SAMBA_DC_DNS_BACKEND='BIND9_DLZ' \
-	     "topinfo/samba:latest" \
-	    --name topsamba
+	     "topinfo/samba:latest"
 else
 	echo -e "Tudo certo!\n"
 fi
