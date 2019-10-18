@@ -32,14 +32,14 @@ fi
 
 imagem=$(docker image ls | grep topinfo)
 
-if [ ! -z "$imagem" ]; then
+if [ -z "$imagem" ]; then
 	echo -e "Criando imagem para o Container\n"
 	createimage
 fi
 
 rede=$(docker network ls | grep nettopinfo)
 
-if [ ! -z "$rede" ]; then
+if [ -z "$rede" ]; then
 	echo "Criando rede virtual\n"
         createvirtualnetwork
 fi
@@ -52,7 +52,7 @@ if [-z $firewallDNAT && -z $firewallSNAT]; then
 	iptables -t nat -A POSTROUTING -s $IPCONTAINER -j SNAT --to-source $IPSAMBA
 	iptables -t nat -A PREROUTING -d $IPSAMBA -j DNAT --to-destination $IPCONTAINER
 	else
-	print -e "Firewall já configurado"
+	echo -e "Firewall já configurado"
 fi
 
 docker run -d --restart unless-stopped \
