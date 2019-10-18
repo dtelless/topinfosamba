@@ -23,6 +23,8 @@ if [ ! -f /samba/etc/smb.conf ]; then
     echo "${SAMBA_DC_DOMAIN} - Domain Provisioned Successfully"
 
 	if [ -f /var/lib/samba/private/named.conf ] ; then
+		cp /var/lib/samba/private/krb5.conf /etc/krb5.conf
+		samba_dnsupdate --current-ip="${IPSAMBA}" --verbose
 		touch /var/log/bind.log
 		chown bind /var/log/bind.log
 		mv /etc/bind/namedsamba.conf /etc/bind/named.conf
