@@ -51,7 +51,7 @@ if [-z $firewallDNAT && -z $firewallSNAT]; then
 	echo "Configurando Firewall...."
 	iptables -t nat -A POSTROUTING -s $IPCONTAINER -j SNAT --to-source $IPSAMBA
 	iptables -t nat -A PREROUTING -d $IPSAMBA -j DNAT --to-destination $IPCONTAINER
-	;else;
+	else
 	print -e "Firewall já configurado"
 fi
 
