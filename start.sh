@@ -44,8 +44,8 @@ if [ ! -z "$rede" ]; then
         createvirtualnetwork
 fi
 
-firewallDNAT=$(iptables -L -t nat | grep DNAT | grep $IPCONATINER)
-firewallSNAT=$(iptables -L -t nat | grep SNAT | grep $IPCONATINER)
+firewallDNAT=$(iptables -L -t nat | grep DNAT | grep $IPCONTAINER)
+firewallSNAT=$(iptables -L -t nat | grep SNAT | grep $IPCONTAINER)
 
 if [-z $firewallDNAT && -z $firewallSNAT]; then
 	echo "Configurando Firewall...."
