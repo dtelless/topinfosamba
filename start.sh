@@ -75,7 +75,7 @@ if [ -z "$topsamba" ]; then
 	    --privileged \
 	    --net nettopinfo \
 	    --ip $IPCONTAINER \
-	    --dns=$IPCONTAINER \
+	    --dns 127.0.0.1 \
 	    --dns-search=$REALM \
 	    -e SAMBA_DC_REALM=$REALM \
 	    -e SAMBA_DC_DOMAIN=$DOMAIN \
