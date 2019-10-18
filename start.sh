@@ -13,7 +13,8 @@ sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubun
 sudo apt update
 sudo apt install docker-ce
 apt-cache policy docker-ce
-sudo systemctl status docker
+echo "{\"iptables\": false}" > /etc/docker/daemon.json
+/etc/init.d/docker restart
 }
 
 function createimage {
@@ -47,7 +48,7 @@ fi
 firewallDNAT=$(iptables -L -t nat | grep DNAT | grep $IPCONTAINER)
 firewallSNAT=$(iptables -L -t nat | grep SNAT | grep $IPCONTAINER)
 
-if [-z $firewallDNAT && -z $firewallSNAT]; then
+if [ -z "$firewallDNAT" && -z "$firewallSNAT"]; then
 	echo "Configurando Firewall...."
 	iptables -t nat -A POSTROUTING -s $IPCONTAINER -j SNAT --to-source $IPSAMBA
 	iptables -t nat -A PREROUTING -d $IPSAMBA -j DNAT --to-destination $IPCONTAINER
