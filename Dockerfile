@@ -14,8 +14,9 @@ RUN cat /etc/apt/sources.list | sed s/archive.ubuntu.com/ubuntu.c3sl.ufpr.br/ > 
     && ln -s /samba/etc /etc/samba \
     && ln -s /samba/lib /var/lib/samba \
     && ln -s /samba/log /var/log/samba
-RUN DEBIAN_FRONTEND=noninteractive apt-get install -y openssh-server samba krb5-config winbind smbclient libencode-locale-perl bind9 \
-    && rm -rf /etc/samba/smb.conf && rm -rf /var/lib/apt/lists/*
+RUN DEBIAN_FRONTEND=noninteractive apt-get install -y openssh-server samba krb5-config winbind smbclient libencode-locale-perl bind9 vim libnss-winbind libpam-winbind supervisor rsyslog\
+    && rm -rf /etc/samba/smb.conf && rm -rf /var/lib/apt/lists/*\
+    && mkdir -p /var/log/supervisor
 
 # Expose ports
 EXPOSE 37/udp \
@@ -35,14 +36,16 @@ EXPOSE 37/udp \
 
 # Persist the configuration, data and log directories
 VOLUME ["/samba"]
+VOLUME ["/mnt/samba00:/export/samba00"]
+ADD nsswitch.conf /etc/nsswitch.conf
 
 # Copy & set entrypoint for manual access
 COPY ./docker-entrypoint.sh /
 COPY ./named.conf /etc/bind/namedsamba.conf
 COPY ./named.conf.log /etc/bind/named.conf.log
-ENTRYPOINT ["/docker-entrypoint.sh"]
-CMD ["samba"]
-#CMD ["/bin/bash"]
+#ENTRYPOINT ["/docker-entrypoint.sh"]
+#CMD ["samba"]
+CMD ["/bin/bash"]
 # Metadata
 #ARG BUILD_DATE
 #ARG VCS_REF

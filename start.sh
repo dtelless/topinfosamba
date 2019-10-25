@@ -1,12 +1,14 @@
 #!/bin/bash
-IPLOCAL=""
-IPSAMBA="192.168.171.212"
+IPLOCAL="192.168.171.211"
 
 REALM="brservicer.local"
 DOMAIN="brservicer"
 
-IPCONTAINER="10.0.5.10"
-REDEDOCKER="10.0.5.0/24"
+IPCONTAINER="192.168.171.213"
+REDECLIENTE="192.168.171.0/24"
+GWCLIENTE="192.168.171.254"
+
+NOMESRV="DC"
 
 function installdocker {
 sudo apt update
@@ -25,7 +27,11 @@ function createimage {
 }
 
 function createvirtualnetwork {
-docker network create --subnet=$REDEDOCKER -o "com.docker.network.bridge.host_binding_ipv4"="0.0.0.0" -o "com.docker.network.bridge.enable_icc"="true" -o "com.docker.network.driver.mtu"="1500" -o "com.docker.network.bridge.name"="lxcbr1" -o "com.docker.network.bridge.enable_ip_masquerade"="true" nettopinfo
+docker network create -d macvlan -o parent=br0 \
+  --subnet $REDECLIENTE \
+  --gateway $GWCLIENTE \
+  --aux-address host="$IPLOCAL" \
+  nettopinfo
 }
 
 
@@ -54,34 +60,25 @@ else
 	echo -e "Rede virtual já criada!\n"
 fi
 
-firewallDNAT=$(iptables -L -t nat | grep DNAT | grep $IPCONTAINER)
-firewallSNAT=$(iptables -L -t nat | grep SNAT | grep $IPCONTAINER)
-
-if [ -z "$firewallDNAT" ] && [ -z "$firewallSNAT"]; then
-	echo "Configurando Firewall...."
-	iptables -t nat -A POSTROUTING -s $IPCONTAINER -j SNAT --to-source $IPSAMBA
-	iptables -t nat -A PREROUTING -d $IPSAMBA -j DNAT --to-destination $IPCONTAINER
-	else
-	echo -e "Firewall já configurado"
-fi
-
 topsamba=$(docker ps | grep topsamba)
 
 if [ -z "$topsamba" ]; then
 	docker run \
-	    -d \
+	    -ti \
 	    --restart unless-stopped \
 	    --name=topsamba \
 	    --privileged \
 	    --net nettopinfo \
 	    --ip $IPCONTAINER \
-	    --dns 127.0.0.1 \
+	    --dns $IPCONTAINER \
 	    --dns-search=$REALM \
+	    --hostname $NOMESRV \
 	    -e SAMBA_DC_REALM=$REALM \
 	    -e SAMBA_DC_DOMAIN=$DOMAIN \
 	    -e SAMBA_DC_ADMIN_PASSWD='T0p123#$' \
 	    -e SAMBA_DC_DNS_BACKEND='BIND9_DLZ' \
-	    -e IPSAMBA=$IPSAMBA \
+	    -e IPSAMBA=$IPCONTAINER \
+	    -e NOMESRV=$NOMESRV \
 	     "topinfo/samba:latest"
 else
 	echo -e "Tudo certo!\n"
